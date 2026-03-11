@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Grammarly Clone",
+  "description": "AI Writing Assistant - Grammar and tone transformation",
+  "version": "1.0.0",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "commands": {
+    "analyze-text": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+G",
+        "mac": "Command+Shift+G"
+      },
+      "description": "Analyze selected text"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+}

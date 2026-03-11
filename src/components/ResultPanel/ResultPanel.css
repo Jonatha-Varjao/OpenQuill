@@ -1,0 +1,150 @@
+.result-panel {
+  padding: 8px 0;
+}
+
+.result-section {
+  margin-bottom: 20px;
+}
+
+.result-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.result-content {
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.result-content.transformed {
+  background: #ecfdf5;
+  border: 1px solid #10b981;
+}
+
+.result-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.copy-btn,
+.replace-btn,
+.back-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.copy-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.copy-btn:hover {
+  background: #e5e7eb;
+}
+
+.replace-btn {
+  background: #10b981;
+  color: white;
+}
+
+.replace-btn:hover {
+  background: #059669;
+}
+
+.back-btn {
+  width: 100%;
+  background: #f3f4f6;
+  color: #374151;
+  margin-top: 8px;
+}
+
+.back-btn:hover {
+  background: #e5e7eb;
+}
+
+.issues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.issue {
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.issue-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.issue-warning {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.issue-suggestion {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.issue-type {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.issue-message {
+  color: #374151;
+}
+
+.issue-suggestion {
+  color: #059669;
+  font-style: italic;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #10b981;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.no-result {
+  text-align: center;
+  color: #6b7280;
+  padding: 40px;
+}

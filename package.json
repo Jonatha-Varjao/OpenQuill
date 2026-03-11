@@ -1,0 +1,40 @@
+{
+  "name": "grammarly-clone",
+  "version": "1.0.0",
+  "description": "AI Writing Assistant - Grammar and tone transformation extension",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:chrome": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.3.0",
+    "@types/chrome": "^0.0.280",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vitejs/plugin-react": "^5.1.4",
+    "eslint": "^9.0.0",
+    "eslint-plugin-react": "^7.36.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0",
+    "vite": "^7.3.1",
+    "vitest": "^2.0.0"
+  }
+}
