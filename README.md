@@ -4,11 +4,12 @@ A privacy-first browser extension that analyzes text using local or cloud LLMs, 
 
 ## Features
 
-- **Text Analysis**: Grammar, syntax, and semantic checking
+- **Text Analysis**: Grammar, syntax, and semantic checking (English only)
 - **Tone Transformation**: Rewrite text with different emotions (Professional, Casual, Friendly, Formal, Academic, Creative)
 - **Local LLM Support**: Works with Ollama, LM Studio, llama.cpp
 - **Cloud Fallback**: OpenAI-compatible API support
 - **Privacy-First**: All processing can happen locally on your machine
+- **Language**: English only
 
 ## Prerequisites
 
@@ -195,6 +196,8 @@ bun run build
 
 ## LLM Configuration
 
+> **Important**: This extension only supports **English** text analysis and transformation.
+
 ### Local (Ollama)
 
 1. Install [Ollama](https://ollama.ai)
@@ -206,6 +209,19 @@ bun run build
 
 1. Get an API key from OpenAI, Anthropic, or any OpenAI-compatible provider
 2. Configure the endpoint URL and API key in extension settings
+
+### Emotions (Tone Transformation)
+
+The extension supports these emotion types for text transformation:
+
+| Emotion | Description |
+|---------|-------------|
+| `professional` | Business and corporate writing |
+| `casual` | Friendly, conversational tone |
+| `friendly` | Warm and approachable |
+| `formal` | Structured and objective |
+| `academic` | Scholarly and research-focused |
+| `creative` | Imaginative and expressive |
 
 ## Tech Stack
 
