@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "types": ["bun-types", "chrome"]
   },
   "include": ["src/**/*", "*.config.ts"],
   "exclude": ["node_modules", "dist", ".output"]
