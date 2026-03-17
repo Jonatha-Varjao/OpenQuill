@@ -28,175 +28,110 @@ bun --version
 
 ## Quick Start
 
-Choose your preferred runtime:
-
-### Bun (Recommended)
-
 ```bash
 bun install
 bun run dev
 ```
 
-### npm
+- Open `chrome://extensions/`, enable **Developer mode**, and load the `dist/` folder
 
-```bash
-npm install
-npm run dev
-```
+## Commands
 
-### yarn
-
-```bash
-yarn
-yarn dev
-```
-
----
-
-## Development
-
-### Development Mode
-
-```bash
-bun run dev   # or npm run dev / yarn dev
-```
-
-- Hot reload enabled
-- Auto-build on file save
-- Open `chrome://extensions/`, enable Developer mode, and load the `dist/` folder
-
-### Debugging
-
-#### VS Code
-
-1. Install "Chrome Debugger" or "Edge Tools" extension
-2. Press `F5` or go to Run > Start Debugging
-3. Select "Chrome: Debug Extension"
-4. Configure `launch.json` as shown below:
-
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Debug Extension",
-      "type": "chrome",
-      "request": "launch",
-      "url": "chrome://extensions/",
-      "webRoot": "${workspaceFolder}",
-      "preLaunchTask": "dev"
-    }
-  ]
-}
-```
-
-#### In Browser
-
-1. Open `chrome://extensions/`
-2. Click "Service Worker" (link in background) to debug the service worker
-3. Right-click the popup > Inspect to debug the UI
-
-### Build
-
-```bash
-# Production
-bun run build   # or npm run build
-
-# Clean previous build
-bun run clean
-```
-
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/Jonatha-Varjao/grammarly-clone.git
-cd grammarly-clone
-
-# Install dependencies
-bun install
-```
-
-## Development
-
-```bash
-# Build for production
-bun run build
-
-# Build output will be in dist/ folder
-```
+| Command             | Description                             |
+| ------------------- | --------------------------------------- |
+| `bun run dev`       | Dev server with hot reload (watch mode) |
+| `bun run build`     | Production build                        |
+| `bun run typecheck` | Run TypeScript type checker             |
+| `bun run lint`      | Run ESLint                              |
+| `bun run lint:fix`  | Fix ESLint errors automatically         |
+| `bun test`          | Run all tests                           |
+| `bun test --watch`  | Run tests in watch mode                 |
+| `bun test <file>`   | Run single test file                    |
+| `bun run clean`     | Clean `dist/` folder                    |
 
 ## Loading the Extension
 
-### Chrome/Edge/Brave
+### Chrome / Edge / Brave
 
-1. Build the extension: `bun run build`
+1. Run `bun run build`
 2. Open `chrome://extensions/`
 3. Enable **Developer mode** (toggle in top-right)
 4. Click **Load unpacked**
-5. Select the `dist` folder
+5. Select the `dist/` folder
 
 ### Firefox
 
-1. Build the extension
+1. Run `bun run build`
 2. Open `about:debugging#/runtime/this-firefox`
 3. Click **Load Temporary Add-on**
-4. Select the `manifest.json` file in the `dist` folder
+4. Select the `manifest.json` file inside `dist/`
 
 ## Project Structure
 
 ```
-.
 ├── src/
-│   ├── background.ts       # Service worker (MV3)
-│   ├── content.ts          # Content script (injected into pages)
-│   ├── popup/              # Extension popup UI
-│   │   ├── main.tsx
+│   ├── background.ts           # Service worker entry (MV3)
+│   ├── content.ts              # Content script (FAB injection)
+│   ├── popup/
+│   │   ├── main.tsx            # Popup React entry
 │   │   ├── PopupApp.tsx
 │   │   └── popup.css
-│   ├── sidepanel/          # Side panel UI
-│   │   ├── main.tsx
+│   ├── sidepanel/
+│   │   ├── main.tsx            # Side panel React entry
 │   │   ├── SidepanelApp.tsx
 │   │   └── sidepanel.css
-│   ├── components/          # Shared React components
-│   │   ├── EmotionSelector/
-│   │   ├── TextInput/
-│   │   ├── ResultPanel/
-│   │   └── HistoryPanel/
-│   ├── hooks/              # Custom React hooks
-│   ├── stores/              # Zustand state stores
-│   ├── services/            # LLM API services
-│   ├── types/               # TypeScript type definitions
-│   └── utils/
-├── public/                  # Static assets
-│   └── manifest.json
-├── dist/                    # Build output
-├── docs/                    # Documentation
-├── build.ts                 # Bun build script
+│   ├── components/
+│   │   ├── EmotionSelector/    # Tone selection UI
+│   │   ├── TextInput/          # Text area with counter
+│   │   ├── ResultPanel/        # Analysis/transformation output
+│   │   └── HistoryPanel/       # History list UI
+│   ├── hooks/
+│   │   ├── useLLM.ts           # LLM analysis/transform logic
+│   │   └── useLLM.test.ts
+│   ├── stores/                 # Zustand state (persisted to chrome.storage)
+│   │   ├── appStore.ts         # UI state (text, emotion, result)
+│   │   ├── settingsStore.ts    # User settings (provider, model, endpoint)
+│   │   ├── historyStore.ts     # Analysis history
+│   │   └── index.ts            # Re-exports
+│   ├── services/
+│   │   ├── llm.ts              # LLM API calls (Ollama + OpenAI-compat)
+│   │   └── llm.test.ts
+│   ├── types/
+│   │   └── index.ts            # All TypeScript interfaces
+│   └── __mocks__/
+│       └── chrome.ts           # Chrome API mock for tests
+├── public/
+│   ├── manifest.json           # Extension manifest (MV3)
+│   ├── popup.html
+│   ├── sidepanel.html
+│   └── icons/
+├── build.ts                    # Bun-based build script
 ├── tsconfig.json
+├── eslint.config.js
+├── .prettierrc
 └── package.json
 ```
 
-## Loading the Extension
+## Tech Stack
 
-### Chrome/Edge/Brave
+| Technology          | Version     |
+| ------------------- | ----------- |
+| **Runtime**         | Bun         |
+| **Language**        | TypeScript `^5.6.0` (strict mode) |
+| **Bundler**         | Bun (native `Bun.build()`) |
+| **UI Framework**    | React `^18.3.1` |
+| **State Management**| Zustand `^5.0.0` + persist middleware |
+| **Extension**       | Manifest V3 |
+| **Types**           | `@types/chrome` `^0.0.280`, `bun-types` `^1.3.10` |
 
-1. Run `bun run dev` to start the development server
-2. Open `chrome://extensions/`
-3. Enable **Developer mode** (toggle in top-right)
-4. Click **Load unpacked**
-5. Select the `dist` or `output` folder
+## Code Quality
 
-### Firefox
-
-1. Run `bun run dev`
-2. Open `about:debugging#/runtime/this-firefox`
-3. Click **Load Temporary Add-on**
-4. Select the `manifest.json` file
+- **ESLint** `>=10` with `@typescript-eslint` `^8.57.0` — unused vars as warnings, `_`-prefixed args ignored
+- **Prettier** — single quotes, semicolons, trailing commas (es5), 100 char width
+- **TypeScript strict** — `noUnusedLocals`, `noUnusedParameters`, `noFallthroughCasesInSwitch`
+- **Path alias** — `@/*` maps to `src/*`
 
 ## LLM Configuration
-
-> **Important**: This extension only supports **English** text analysis and transformation.
 
 ### Local (Ollama)
 
@@ -212,25 +147,18 @@ bun run build
 
 ### Emotions (Tone Transformation)
 
-The extension supports these emotion types for text transformation:
+| Emotion        | Description                      |
+| -------------- | -------------------------------- |
+| `professional` | Business and corporate writing   |
+| `casual`       | Friendly, conversational tone    |
+| `friendly`     | Warm and approachable            |
+| `formal`       | Structured and objective         |
+| `academic`     | Scholarly and research-focused   |
+| `creative`     | Imaginative and expressive       |
 
-| Emotion | Description |
-|---------|-------------|
-| `professional` | Business and corporate writing |
-| `casual` | Friendly, conversational tone |
-| `friendly` | Warm and approachable |
-| `formal` | Structured and objective |
-| `academic` | Scholarly and research-focused |
-| `creative` | Imaginative and expressive |
+## Keyboard Shortcut
 
-## Tech Stack
-
-- **Runtime**: Bun
-- **Language**: TypeScript (strict mode)
-- **Bundler**: Bun (native bundler)
-- **UI Framework**: React 18
-- **State Management**: Zustand 5
-- **Extension Manifest**: MV3
+`Ctrl+Shift+G` (or `Cmd+Shift+G` on Mac) — Analyze selected text on any page.
 
 ## License
 
