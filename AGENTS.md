@@ -42,7 +42,7 @@ This project uses Bun.
 ### General Principles
 - **TypeScript Strict Mode**: All code must pass strict type checking
 - **No `any` types**: Use `unknown` then narrow properly
-- **ESLint + Prettier**: Configured with single quotes, 2-space tabs
+- **ESLint + Prettier**: Configured with single quotes, 2-space indentation, trailing commas (es5), semicolons
 - **Single Responsibility**: Small, focused components (<200 lines)
 
 ### Naming Conventions
@@ -58,8 +58,10 @@ const MAX_TEXT_LENGTH = 10000;
 interface AnalysisResult {}
 type EmotionType = 'professional' | 'casual';
 
-// Files: kebab-case (TextInput.tsx, llm.ts)
-// Directories: kebab-case (src/components/, src/services/)
+// Component files: PascalCase (EmotionSelector.tsx, ResultPanel.tsx)
+// Module files: camelCase (llm.ts, useLLM.ts, appStore.ts)
+// Component directories: PascalCase (EmotionSelector/, ResultPanel/)
+// Module directories: camelCase (services/, stores/, hooks/)
 ```
 
 ### Imports Order
@@ -68,7 +70,7 @@ type EmotionType = 'professional' | 'casual';
 import { useState } from 'react';
 import { create } from 'zustand';
 
-// 2. Internal modules (use @/ alias)
+// 2. Internal modules (@/ resolves to src/ per tsconfig.json paths)
 import { useAppStore } from '@/stores/appStore';
 import { transformText } from '@/services/llm';
 
@@ -128,8 +130,9 @@ const useStore = create<AppState>((set) => ({
 
 ### Testing Patterns
 ```typescript
-// Test file naming: *.test.ts
-import { describe, it, expect } from 'bun:test';
+// Test file naming: *.test.ts (co-located with source)
+import '@/__mocks__/chrome'; // Required side-effect when testing stores
+import { describe, it, expect, beforeEach, mock } from 'bun:test';
 import { transformText } from './llm';
 
 describe('transformText', () => {
@@ -165,16 +168,19 @@ function getStorage<T>(key: string): Promise<T> {
 ### File Organization
 ```
 src/
-├── background/        # Service worker
-├── content/          # Injected scripts  
-├── popup/            # Popup UI (PopupApp.tsx)
-├── sidepanel/        # Side panel UI (SidepanelApp.tsx)
-├── components/       # Shared UI components
-├── hooks/           # Custom React hooks (useLLM.ts)
-├── stores/          # Zustand stores (appStore.ts)
-├── services/        # External APIs (llm.ts)
-├── utils/           # Helper functions
-└── types/           # TypeScript definitions
+├── __mocks__/        # Test mocks (chrome.ts for storage API)
+├── background/       # Service worker logic
+├── background.ts     # Service worker entry
+├── content/          # Injected script logic
+├── content.ts        # Content script entry
+├── popup/            # Popup UI (main.tsx, PopupApp.tsx)
+├── sidepanel/        # Side panel UI (main.tsx, SidepanelApp.tsx)
+├── components/       # Shared UI (EmotionSelector/, TextInput/, etc.)
+├── hooks/            # Custom React hooks (useLLM.ts)
+├── stores/           # Zustand stores (appStore.ts, settingsStore.ts, historyStore.ts)
+├── services/         # External APIs (llm.ts)
+├── utils/            # Helper functions
+└── types/            # TypeScript definitions (index.ts)
 ```
 
 ### Key Patterns
