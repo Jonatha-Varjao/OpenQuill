@@ -45,3 +45,10 @@ coverage/
 # AI-Tools
 opencode.json
 .config/
+.opencode/skills/
+.cursorrules
+.cursor/
+.github/copilot-instructions.md
+.aider*
+.claude/
+.agents/

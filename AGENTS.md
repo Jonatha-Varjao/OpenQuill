@@ -188,3 +188,14 @@ src/
 - **Content Scripts**: Run at `document_idle`, use MutationObserver for dynamic content
 - **Storage**: `chrome.storage.local` for extension data, handle quota errors
 - **Messaging**: Use typed message passing between extension parts
+
+## Skills Locais
+
+Skills de referência rápida estão em `.opencode/skills/` (não versionadas).
+
+| Skill | Descrição |
+|-------|-----------|
+| `openquill-testing` | Padrões de teste: bun:test, chrome mock, stores/services/hooks |
+| `openquill-react-zustand` | Padrões React + Zustand: stores, components, hooks, imports, types |
+
+Carregue via tool `skill({ name: "openquill-testing" })` ou `skill({ name: "openquill-react-zustand" })`.
