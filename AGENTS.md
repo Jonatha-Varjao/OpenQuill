@@ -37,13 +37,62 @@ This project uses Bun.
 
 ---
 
+## TypeScript Configuration
+
+```jsonc
+// tsconfig.json — key settings
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": { "@/*": ["src/*"] },
+    "types": ["bun-types", "chrome"]
+  }
+}
+```
+
+- **Path alias**: `@/*` resolves to `src/*`
+- **No emit**: `noEmit: true` — Bun handles bundling
+
+---
+
 ## Code Style Guidelines
 
 ### General Principles
 - **TypeScript Strict Mode**: All code must pass strict type checking
 - **No `any` types**: Use `unknown` then narrow properly
-- **ESLint + Prettier**: Configured with single quotes, 2-space indentation, trailing commas (es5), semicolons
+- **ESLint + Prettier**: See detailed config below
 - **Single Responsibility**: Small, focused components (<200 lines)
+
+### ESLint Configuration
+```js
+// eslint.config.js — key rules
+'@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }]
+```
+- Unused vars are **warnings** (not errors)
+- `_`-prefixed args are ignored
+- `no-unused-vars` and `no-undef` turned off in favor of `@typescript-eslint` versions
+
+### Prettier Configuration
+```jsonc
+// .prettierrc
+{
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "jsxSingleQuote": false
+}
+```
 
 ### Naming Conventions
 ```typescript
@@ -164,6 +213,127 @@ function getStorage<T>(key: string): Promise<T> {
 ```
 
 ## Architecture Notes
+
+### Manifest V3 — Permissions & Structure
+
+```jsonc
+// public/manifest.json — key fields
+{
+  "manifest_version": 3,
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "action": { "default_popup": "popup.html" },
+  "side_panel": { "default_path": "sidepanel.html" },
+  "commands": {
+    "analyze-text": {
+      "suggested_key": { "default": "Ctrl+Shift+G", "mac": "Command+Shift+G" },
+      "description": "Analyze selected text"
+    }
+  },
+  "background": { "service_worker": "background.js", "type": "module" }
+}
+```
+
+- **Background**: ESM service worker (not background pages)
+- **Side panel**: Always available via `chrome.sidePanel.open()`
+- **Keyboard shortcut**: Triggers `ANALYZE_SELECTION` message to content script
+
+### Extension Communication
+
+```
+Content Script → Background:  chrome.runtime.sendMessage({ action, payload })
+Background → Content Script:  chrome.tabs.sendMessage(tabId, { action })
+Message handlers return true to keep channel open (async sendResponse)
+```
+
+- **Content script** (`content.ts`): Injects FAB on text selection, sends `ANALYZE_TEXT` to background
+- **Background** (`background.ts`): Routes messages, handles `analyze-text` command via `chrome.commands.onCommand`
+- **FAB**: Floating action button (`position: absolute`, `z-index: 2147483647`) appears below selected text
+
+### Core Types
+
+```typescript
+// EmotionType — 6 tone profiles
+type EmotionType = 'professional' | 'casual' | 'friendly' | 'formal' | 'academic' | 'creative';
+
+// AnalysisResult — grammar/style issues
+interface AnalysisResult {
+  text: string;
+  issues: GrammarIssue[];  // type, severity, message, position, suggestion
+  score?: number;
+}
+
+// TransformationResult — rewritten text
+interface TransformationResult {
+  original: string;
+  transformed: string;
+  emotion: EmotionType;
+  changes?: { type: 'word_choice' | 'structure' | 'tone' | 'grammar'; description: string }[];
+}
+
+// Settings — user-configurable
+interface Settings {
+  provider: 'ollama' | 'openai' | 'custom';
+  endpoint: string;          // e.g. http://localhost:11434
+  apiKey: string;
+  model: string;             // e.g. llama3.2
+  defaultEmotion: EmotionType;
+  defaultAnalysisMode: 'grammar' | 'tone' | 'both';
+  saveHistory: boolean;
+  maxHistoryItems: number;
+  // ... autoAnalyze, showFab, keyboardShortcut
+}
+
+// HistoryItem — stored analysis/transformations
+interface HistoryItem {
+  id: string;
+  timestamp: number;
+  originalText: string;
+  transformedText?: string;
+  emotion?: EmotionType;
+  analysis?: AnalysisResult;
+  provider: string;
+  model: string;
+}
+```
+
+### LLM Service — Endpoints by Provider
+
+```typescript
+// Health check (Ollama-specific)
+await fetch(`${endpoint}/api/tags`);
+
+// Transform/Analyze — different endpoints per provider:
+// Ollama:        POST ${endpoint}/api/generate        { model, prompt, stream: false }
+// OpenAI-compat: POST ${endpoint}/chat/completions     { model, messages: [{ role, content }] }
+
+// API Key: only sent when provider !== 'ollama'
+// Authorization header: `Bearer ${apiKey}`
+```
+
+- `checkConnection()`: Pings `/api/tags` (Ollama-specific health check)
+- `getModels()`: Fetches available models from `/api/tags`
+- Response parsing: Ollama returns `{ response }`, OpenAI returns `{ choices[0].message.content }`
+
+### Zustand Stores — Persistence
+
+```typescript
+// settingsStore uses persist() middleware with chrome.storage.local
+import { persist, createJSONStorage } from 'zustand/middleware';
+
+// Custom storage adapter wraps chrome.storage.local API
+const useSettingsStore = create<SettingsState>()(
+  persist((set) => ({ /* ... */ }), {
+    name: 'openquill-settings',
+    storage: createJSONStorage(() => createChromeStorage()),
+  })
+);
+```
+
+- **settingsStore**: Persisted to `chrome.storage.local` as `openquill-settings`
+- **historyStore**: Persisted to `chrome.storage.local`, limits items to `maxHistoryItems` (default 50)
+- **appStore**: In-memory only (resets on popup close)
+- **Tests**: Must import `@/__mocks__/chrome` as side-effect before stores that use `persist()`
 
 ### File Organization
 ```
