@@ -1,31 +1,174 @@
 # Architecture Documentation
 
-## Technical Architecture
+## System Overview
 
-### Overview
+```mermaid
+graph TB
+    subgraph "Browser Extension"
+        subgraph "Background"
+            BG["background.ts<br/>Service Worker (MV3)"]
+        end
+        subgraph "Content"
+            CS["content.ts<br/>Content Script"]
+            FAB["FAB Button"]
+        end
+        subgraph "UI"
+            POPUP["popup/main.tsx<br/>PopupApp"]
+            SIDE["sidepanel/main.tsx<br/>SidepanelApp"]
+        end
+        subgraph "Components"
+            TI["TextInput"]
+            ES["EmotionSelector"]
+            RP["ResultPanel"]
+            HP["HistoryPanel"]
+        end
+        subgraph "State"
+            APP["appStore"]
+            SET["settingsStore"]
+            HIST["historyStore"]
+        end
+        subgraph "Services"
+            LLM["services/llm.ts"]
+            HOOK["hooks/useLLM.ts"]
+        end
+    end
+    subgraph "External"
+        OLLAMA["Ollama<br/>localhost:11434"]
+        OPENAI["OpenAI API"]
+    end
 
-This is a browser extension built with **Manifest V3** that provides AI-powered text analysis and tone transformation. The extension communicates with local (Ollama) or cloud (OpenAI-compatible) LLMs to analyze and rewrite text based on different emotional tones.
+    CS --> FAB
+    POPUP --> TI & ES & RP
+    SIDE --> TI & ES & RP & HP
+    TI & ES & RP --> APP
+    HP --> HIST
+    APP --> HOOK --> LLM
+    LLM --> OLLAMA & OPENAI
+    CS & POPUP -->|"chrome.runtime.sendMessage"| BG
+```
 
-### Tech Stack
+## Component Hierarchy
 
-| Layer          | Technology          | Rationale                                      |
-| -------------- | ------------------- | ---------------------------------------------- |
-| **Runtime**    | Bun                 | Fast package management and execution          |
-| **Language**   | TypeScript (strict) | Type safety, better DX                         |
-| **Build Tool** | Bun (native)        | Fast bundler included in Bun runtime           |
-| **UI**         | React               | Component-based, state management              |
-| **State**      | Zustand             | Lightweight (~1KB), no provider wrapping       |
-| **Manifest**   | V3                  | Required for Chrome, supported by all browsers |
+```mermaid
+graph TB
+    POPUP["PopupApp"] --> TI1["TextInput"]
+    POPUP --> ES1["EmotionSelector"]
+    POPUP --> RP1["ResultPanel"]
+    SIDE["SidepanelApp"] --> TI2["TextInput"]
+    SIDE --> ES2["EmotionSelector"]
+    SIDE --> RP2["ResultPanel"]
+    SIDE --> HP["HistoryPanel"]
+    TI1 & TI2 & ES1 & ES2 & RP1 & RP2 --> APP["appStore"]
+    HP --> HIST["historyStore"]
+    APP --> HOOK["useLLM"] --> LLM["llm.ts"]
+    LLM --> OLLAMA["Ollama"]
+    LLM --> OPENAI["OpenAI API"]
+```
 
-### Browser Support Strategy
+## Data Flow
 
-| Priority  | Browsers                   | Approach                         |
-| --------- | -------------------------- | -------------------------------- |
-| Primary   | Chrome, Edge, Brave, Opera | Native MV3 support               |
-| Secondary | Firefox                    | WebExtensions polyfill if needed |
-| Future    | Safari                     | Extension Workshop guidelines    |
+```mermaid
+sequenceDiagram
+    participant User
+    participant CS as content.ts
+    participant BG as background.ts
+    participant UI as Popup/Sidepanel
+    participant Store as appStore
+    participant Hook as useLLM
+    participant LLM as services/llm.ts
+    participant API as Ollama/OpenAI
 
-**Cross-browser tradeoff**: Starting Chromium-first simplifies v1.0. Adding Firefox support requires handling `chrome.*` vs `browser.*` namespace differences and potential polyfills.
+    User->>CS: Select text
+    CS->>CS: Show FAB
+    User->>CS: Click FAB
+    CS->>BG: sendMessage(ANALYZE_TEXT)
+    BG-->>User: Open sidepanel
+
+    User->>UI: Enter text
+    UI->>Store: setSelectedText()
+    User->>UI: Click Analyze
+    UI->>Hook: analyze()
+    Hook->>Store: setAnalyzing(true)
+    Hook->>LLM: checkConnection()
+    LLM->>API: GET /api/tags
+
+    alt Connected
+        Hook->>LLM: analyzeText()
+        LLM->>API: POST /api/generate
+        API-->>LLM: response
+        LLM-->>Hook: AnalysisResult
+        Hook->>Store: setResult()
+        Hook->>Store: addItem()
+    else Not Connected
+        Hook->>Store: setError()
+    end
+    Hook->>Store: setAnalyzing(false)
+```
+
+## State Stores
+
+```mermaid
+erDiagram
+    appStore {
+        string selectedText
+        EmotionType currentEmotion
+        boolean isAnalyzing
+        result null
+        string error
+        setSelectedText()
+        setEmotion()
+        setAnalyzing()
+        setResult()
+        setError()
+        reset()
+    }
+
+    settingsStore {
+        Provider provider
+        string endpoint
+        string apiKey
+        string model
+        setProvider()
+        setEndpoint()
+        reset()
+    }
+
+    historyStore {
+        HistoryItem[] items
+        addItem()
+        removeItem()
+        clearHistory()
+        reset()
+    }
+
+    appStore --> settingsStore: getState()
+    appStore --> historyStore: addItem()
+```
+
+## Message Protocol
+
+| Action | Direction | Payload |
+|--------|-----------|---------|
+| ANALYZE_TEXT | content → background | `{text, emotion?}` |
+| GET_SETTINGS | popup → background | `{}` |
+| ANALYZE_SELECTION | background → content | `{}` |
+
+```mermaid
+graph LR
+    C[content.ts] -->|"sendMessage"| B[background.ts]
+    B -->|"tabs.sendMessage"| C
+```
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Runtime | Bun |
+| Language | TypeScript strict |
+| Bundler | Bun native |
+| UI | React 18 |
+| State | Zustand 5 |
+| Extension | Manifest V3 |
 
 ---
 
