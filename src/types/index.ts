@@ -84,6 +84,7 @@ export interface SettingsState extends Settings {
   setShowFab: (show: boolean) => void;
   setSaveHistory: (save: boolean) => void;
   setMaxHistoryItems: (max: number) => void;
+  reset: () => void;
 }
 
 export interface HistoryState {
@@ -91,4 +92,5 @@ export interface HistoryState {
   addItem: (item: Omit<HistoryItem, 'id' | 'timestamp'>) => void;
   removeItem: (id: string) => void;
   clearHistory: () => void;
+  reset: () => void;
 }
