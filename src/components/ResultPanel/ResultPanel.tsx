@@ -83,8 +83,8 @@ export default function ResultPanel({ onBack }: ResultPanelProps) {
         <div className="result-section">
           <h3>Grammar Issues</h3>
           <div className="issues-list">
-            {(result as AnalysisResult).issues.map((issue, idx) => (
-              <div key={idx} className={`issue issue-${issue.severity}`}>
+            {(result as AnalysisResult).issues.map((issue) => (
+              <div key={`${issue.type}-${issue.position.start}`} className={`issue issue-${issue.severity}`}>
                 <span className="issue-type">{issue.type}</span>
                 <span className="issue-message">{issue.message}</span>
                 {issue.suggestion && <span className="issue-suggestion">→ {issue.suggestion}</span>}
