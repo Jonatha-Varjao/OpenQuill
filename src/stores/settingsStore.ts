@@ -25,6 +25,7 @@ const DEFAULT_SETTINGS: SettingsState = {
   setShowFab: () => {},
   setSaveHistory: () => {},
   setMaxHistoryItems: () => {},
+  reset: () => {},
 };
 
 function createChromeStorage() {
@@ -70,6 +71,7 @@ export const useSettingsStore = create<SettingsState>()(
       setShowFab: (showFab) => set({ showFab }),
       setSaveHistory: (saveHistory) => set({ saveHistory }),
       setMaxHistoryItems: (maxHistoryItems) => set({ maxHistoryItems }),
+      reset: () => set(DEFAULT_SETTINGS),
     }),
     {
       name: 'openquill-settings',

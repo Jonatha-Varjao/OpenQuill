@@ -59,6 +59,10 @@ export const useHistoryStore = create<HistoryState>()(
       clearHistory: () => {
         set({ items: [] });
       },
+
+      reset: () => {
+        set({ items: [] });
+      },
     }),
     {
       name: 'openquill-history',
