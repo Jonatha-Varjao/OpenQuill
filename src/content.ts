@@ -1,5 +1,9 @@
 console.log('OpenQuill content script loaded');
 
+interface ChromeSidePanel {
+  open: () => void;
+}
+
 let fab: HTMLButtonElement | null = null;
 
 function createFAB(): HTMLButtonElement {
@@ -19,7 +23,7 @@ function createFAB(): HTMLButtonElement {
         action: 'ANALYZE_TEXT',
         payload: { text: text }
       });
-      (chrome.sidePanel as unknown as { open: () => void }).open();
+      (chrome.sidePanel as unknown as ChromeSidePanel).open();
     }
   });
 
@@ -67,7 +71,7 @@ chrome.runtime.onMessage.addListener(function(message) {
     const selection = window.getSelection();
     const text = selection ? selection.toString() : '';
     if (text) {
-      (chrome.sidePanel as unknown as { open: () => void }).open();
+      (chrome.sidePanel as unknown as ChromeSidePanel).open();
     }
   }
 });
