@@ -28,7 +28,7 @@ OpenQuill is a privacy-first browser extension (Manifest V3) that provides gramm
 
 **State Management:** Zustand stores in `src/stores/` use `createJSONStorage(() => chrome.storage.local)` for persistence. Never assume sync access to chrome.storage — always use callbacks/promises.
 
-**LLM Services:** `src/services/llm.ts` handles both Ollama (`/api/generate`) and OpenAI-compatible (`/chat/completions`) endpoints. It reads settings from `useSettingsStore` at call time via `getState()`.
+**LLM Services:** `src/services/llm.ts` supports multiple providers (Ollama, custom OpenAI-compatible). Provider is configured via `useSettingsStore`. For llama.cpp, set provider to `custom` and endpoint to `http://localhost:8080`.
 
 **Key Pattern — Message Passing:** Content scripts communicate with the background service worker via `chrome.runtime.sendMessage`. Listeners must return `true` to keep the channel open for async responses.
 
@@ -44,7 +44,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 ## Development Notes
 
+- llama.cpp default port: 8080 (OpenAI-compatible API at /v1/chat/completions)
 - Ollama runs on `http://localhost:11434` by default
 - The extension uses `@/*` path alias for `src/*`
 - Service workers are stateless — use `chrome.storage` for persistence, not module-level variables
 - Content scripts are isolated from the page — no direct `window` access, use message passing
+
+**Provider Settings:**
+- `ollama` → uses `/api/generate` endpoint
+- `openai` | `custom` → uses `/v1/chat/completions` with Bearer token auth
