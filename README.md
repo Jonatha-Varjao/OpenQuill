@@ -14,7 +14,7 @@ A privacy-first browser extension that analyzes text using local or cloud LLMs, 
 ## Prerequisites
 
 - **Bun** - JavaScript runtime, package manager, and bundler
-- **Ollama** (optional) - For local LLM inference
+- **llama.cpp** (optional) - For local LLM inference with GGUF models
 
 ### Installing Bun
 
@@ -139,6 +139,19 @@ bun run dev
 2. Pull a model: `ollama pull llama3.2`
 3. Start Ollama: `ollama serve`
 4. Configure the extension to use `http://localhost:11434`
+
+### Local (llama.cpp)
+
+1. Download a GGUF model (e.g., Qwen3.5-9B-Q4_K_M from Unsloth/HuggingFace)
+2. Run llama-server:
+   ```bash
+   llama-server -m path/to/model.gguf -ngl 32 -c 8192 -fa --mlock
+   ```
+   Default endpoint: `http://localhost:8080`
+3. In extension settings, set **Provider** to `Custom` and **Endpoint** to `http://localhost:8080`
+4. Set **Model** to match your GGUF filename (e.g., `Qwen3.5-9B-Q4_K_M`)
+
+**Recommended model for 8GB VRAM:** Qwen3.5-9B-Q4_K_M (~5.5GB, ~40 tok/s on RTX 3070)
 
 ### Cloud (OpenAI-compatible)
 
