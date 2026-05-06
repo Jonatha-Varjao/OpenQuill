@@ -1,5 +1,7 @@
 console.log('OpenQuill content script loaded');
 
+import { initInlineEditor } from './content/inlineEditor';
+
 interface ChromeSidePanel {
   open: () => void;
 }
@@ -75,3 +77,5 @@ chrome.runtime.onMessage.addListener(function(message) {
     }
   }
 });
+
+initInlineEditor();
