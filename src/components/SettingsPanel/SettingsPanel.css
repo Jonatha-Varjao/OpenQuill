@@ -1,0 +1,71 @@
+.settings-panel {
+  padding: 8px 0;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 16px;
+}
+
+.settings-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.settings-label {
+  font-size: 14px;
+  color: #374151;
+}
+
+.settings-input {
+  width: 100px;
+  padding: 6px 8px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.settings-input:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  background: #d1d5db;
+  border: none;
+  border-radius: 13px;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s ease;
+}
+
+.toggle-switch.active {
+  background: #10b981;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch.active .toggle-slider {
+  transform: translateX(22px);
+}
