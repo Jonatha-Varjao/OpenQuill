@@ -45,6 +45,8 @@ export interface Settings {
   showFab: boolean;
   saveHistory: boolean;
   maxHistoryItems: number;
+  enableInlineEditing: boolean;
+  inlineDebounceMs: number;
 }
 
 export interface HistoryItem {
@@ -84,6 +86,8 @@ export interface SettingsState extends Settings {
   setShowFab: (show: boolean) => void;
   setSaveHistory: (save: boolean) => void;
   setMaxHistoryItems: (max: number) => void;
+  setEnableInlineEditing: (enabled: boolean) => void;
+  setInlineDebounceMs: (ms: number) => void;
   reset: () => void;
 }
 

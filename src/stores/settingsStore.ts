@@ -14,6 +14,8 @@ const DEFAULT_SETTINGS: SettingsState = {
   showFab: true,
   saveHistory: true,
   maxHistoryItems: 50,
+  enableInlineEditing: false,
+  inlineDebounceMs: 500,
   setProvider: () => {},
   setEndpoint: () => {},
   setApiKey: () => {},
@@ -25,6 +27,8 @@ const DEFAULT_SETTINGS: SettingsState = {
   setShowFab: () => {},
   setSaveHistory: () => {},
   setMaxHistoryItems: () => {},
+  setEnableInlineEditing: () => {},
+  setInlineDebounceMs: () => {},
   reset: () => {},
 };
 
@@ -71,6 +75,8 @@ export const useSettingsStore = create<SettingsState>()(
       setShowFab: (showFab) => set({ showFab }),
       setSaveHistory: (saveHistory) => set({ saveHistory }),
       setMaxHistoryItems: (maxHistoryItems) => set({ maxHistoryItems }),
+      setEnableInlineEditing: (enableInlineEditing) => set({ enableInlineEditing }),
+      setInlineDebounceMs: (inlineDebounceMs) => set({ inlineDebounceMs }),
       reset: () => set(DEFAULT_SETTINGS),
     }),
     {
