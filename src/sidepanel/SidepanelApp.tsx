@@ -4,9 +4,10 @@ import EmotionSelector from '@/components/EmotionSelector/EmotionSelector';
 import TextInput from '@/components/TextInput/TextInput';
 import ResultPanel from '@/components/ResultPanel/ResultPanel';
 import HistoryPanel from '@/components/HistoryPanel/HistoryPanel';
+import SettingsPanel from '@/components/SettingsPanel/SettingsPanel';
 
 export default function SidepanelApp() {
-	const [view, setView] = useState < 'input' | 'result' | 'history' > ('input');
+	const [view, setView] = useState < 'input' | 'result' | 'history' | 'settings' > ('input');
 	const {isAnalyzing, error} = useAppStore();
 
 	return (
@@ -25,6 +26,12 @@ export default function SidepanelApp() {
 						onClick={() => setView('history')}
 					>
 						History
+					</button>
+					<button
+						className={view === 'settings' ? 'active' : ''}
+						onClick={() => setView('settings')}
+					>
+						Settings
 					</button>
 				</nav>
 			</header>
@@ -47,6 +54,8 @@ export default function SidepanelApp() {
 				{view === 'result' && <ResultPanel onBack={() => setView('input')} />}
 
 				{view === 'history' && <HistoryPanel />}
+
+				{view === 'settings' && <SettingsPanel />}
 
 				{error && <div className='error-message'>{error}</div>}
 			</main>
