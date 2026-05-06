@@ -92,24 +92,30 @@ export async function transformText(
   }
 }
 
-export async function analyzeText(text: string): Promise<AnalysisResult> {
+export async function analyzeText(text: string, customPrompt?: string): Promise<AnalysisResult> {
   const settings = useSettingsStore.getState();
 
   const isOllama = settings.provider === 'ollama';
-  const endpoint = isOllama 
+  const endpoint = isOllama
     ? `${settings.endpoint}/api/generate`
     : `${settings.endpoint}/chat/completions`;
+
+  const defaultPrompt = `Analyze this text for grammar, spelling, and style issues.
+Return a JSON object with this structure:
+{"issues": [{"type": "grammar"|"spelling"|"punctuation"|"style", "severity": "error"|"warning"|"suggestion", "message": "...", "position": {"start": N, "end": N}, "suggestion": "..."}]}
+
+Text: ${text}`;
 
   const body = isOllama
     ? {
         model: settings.model,
-        prompt: text,
+        prompt: customPrompt ?? defaultPrompt,
         stream: false,
       }
     : {
         model: settings.model,
         messages: [
-          { role: 'user', content: text },
+          { role: 'user', content: customPrompt ?? defaultPrompt },
         ],
       };
 
